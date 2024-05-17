@@ -15,6 +15,12 @@ import org.mockito.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
 
 public class ExchangeServiceImplTest {
 
@@ -82,6 +88,21 @@ public class ExchangeServiceImplTest {
     @Test
     void checkIfEligibleForExchange() {
 
+//        Appointment appointment = new Appointment();
+//        appointment.setStart(LocalDateTime.now().plusDays(1));
+//        appointment.setStatus(AppointmentStatus.SCHEDULED);
+//
+//        Customer customer = new Customer();
+//        customer.setId(3);
+//        appointment.setCustomer(customer);
+//        when(appointmentRepository.getOne(anyInt())).thenReturn(appointment);
+//
+//
+//        boolean result = exchangeService.checkIfEligibleForExchange(3, 1);
+//
+//
+//        assertTrue(result);
+
     }
 
 
@@ -96,6 +117,18 @@ public class ExchangeServiceImplTest {
      */
     @Test
     void getEligibleAppointmentsForExchangeTest() {
+        Appointment appointmentToExchange = new Appointment();
+        appointmentToExchange.setCustomer(customer1);
+        when(appointmentRepository.getOne(appointmentIdCaptor.capture())).thenReturn(appointmentToExchange);
+
+        Appointment appointment = new Appointment();
+        appointment.setStart(LocalDateTime.now().plusDays(2));
+        appointment.setStatus(AppointmentStatus.SCHEDULED);
+        appointment.setCustomer(customer2);
+        when(appointmentRepository.getEligibleAppointmentsForExchange(any(LocalDateTime.class), anyInt())).thenReturn(List.of(appointment));
+
+        assertEquals(1, exchangeService.getEligibleAppointmentsForExchange(1).size());
+        assertEquals(1, appointmentIdCaptor.getValue());
 
     }
 

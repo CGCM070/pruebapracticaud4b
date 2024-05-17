@@ -32,40 +32,40 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
     @Override
     public List<Appointment> findCanceledByUser(int userId) {
         return appointments.stream().filter(appointment -> appointment.getStatus().equals(AppointmentStatus.CANCELED)
-                                                            && appointment.getCanceler() != null
-                                                            && appointment.getCanceler().getId() == userId)
-                                    .toList();
+                        && appointment.getCanceler() != null
+                        && appointment.getCanceler().getId() == userId)
+                .toList();
     }
 
 
     @Override
     public List<Appointment> findByCustomerIdWithStartInPeroid(int customerId, LocalDateTime startPeroid, LocalDateTime endPeroid) {
-        return appointments.stream().filter(appointment -> appointment.getCustomer()!=null
-                                                            && appointment.getCustomer().getId() == customerId
-                                                            && appointment.getStart().isAfter(startPeroid)
-                                                            && appointment.getEnd().isBefore(endPeroid))
-                                    .toList();
+        return appointments.stream().filter(appointment -> appointment.getCustomer() != null
+                        && appointment.getCustomer().getId() == customerId
+                        && appointment.getStart().isAfter(startPeroid)
+                        && appointment.getEnd().isBefore(endPeroid))
+                .toList();
     }
 
     @Override
     public List<Appointment> findScheduledWithEndBeforeDate(LocalDateTime now) {
         return appointments.stream().filter(appointment -> appointment.getStatus().equals(AppointmentStatus.SCHEDULED)
-                                                            && appointment.getEnd().isBefore(now))
-                                    .toList();
+                        && appointment.getEnd().isBefore(now))
+                .toList();
     }
 
     @Override
     public List<Appointment> getEligibleAppointmentsForExchange(LocalDateTime start, Integer customerId) {
         return appointments.stream().filter(appointment -> appointment.getStatus().equals(AppointmentStatus.SCHEDULED)
-                                                            && appointment.getCustomer().getId() != customerId
-                                                            && appointment.getStart().isAfter(start))
-                                    .toList();
+                        && appointment.getCustomer().getId() != customerId
+                        && appointment.getStart().isAfter(start))
+                .toList();
     }
 
     @Override
     public List<Appointment> findExchangeRequestedWithStartBefore(LocalDateTime date) {
         return appointments.stream().filter(appointment -> appointment.getStatus().equals(AppointmentStatus.EXCHANGE_REQUESTED)
-                                                            && appointment.getStart().isBefore(date))
-                                    .toList();
+                        && appointment.getStart().isBefore(date))
+                .toList();
     }
 }
