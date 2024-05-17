@@ -96,9 +96,8 @@ public class AppointmentRepositoryImplTest {
         List<Appointment> result = appointmentRepository.findCanceledByUser(1);
 
         assertTrue(result.contains(appointment));
-//       assertFalse(result.contains(appointment2));
 
-        /*ESPERABA  ENCONTRAR SOLO LA CITA CANCELANDA .*/
+
 
 
     }
