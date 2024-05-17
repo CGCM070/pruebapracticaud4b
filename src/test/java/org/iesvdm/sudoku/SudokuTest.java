@@ -42,7 +42,6 @@ public class SudokuTest {
 
     @Test
     void fillBoardBasedInCluesRandomlySolvableShouldCreateSolvableBoard() {
-
             /*este test falla, se esperaba que se pudiese resolver*/
 
         Sudoku sudoku = new Sudoku();
