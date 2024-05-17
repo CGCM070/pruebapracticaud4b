@@ -141,7 +141,7 @@ public class ExchangeServiceImplTest {
         int newAppointmentId = 2;
 
         Customer customer = new Customer();
-        customer.setId(2); // El userId del oldAppointment es diferente al userId proporcionado
+        customer.setId(2);
 
         Appointment oldAppointment = new Appointment();
         oldAppointment.setId(oldAppointmentId);
