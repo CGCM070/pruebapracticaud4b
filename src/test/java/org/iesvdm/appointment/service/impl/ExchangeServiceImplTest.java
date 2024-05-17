@@ -1,9 +1,7 @@
 package org.iesvdm.appointment.service.impl;
 
 import net.bytebuddy.asm.Advice;
-import org.iesvdm.appointment.entity.Appointment;
-import org.iesvdm.appointment.entity.AppointmentStatus;
-import org.iesvdm.appointment.entity.Customer;
+import org.iesvdm.appointment.entity.*;
 import org.iesvdm.appointment.repository.AppointmentRepository;
 import org.iesvdm.appointment.repository.ExchangeRequestRepository;
 import org.iesvdm.appointment.repository.impl.AppointmentRepositoryImpl;
@@ -31,17 +29,17 @@ public class ExchangeServiceImplTest {
     private NotificationService notificationService;
 
     @Mock
-    private  ExchangeRequestRepository exchangeRequestRepository;
+    private ExchangeRequestRepository exchangeRequestRepository;
 
     @InjectMocks
     private ExchangeServiceImpl exchangeService;
 
     private Customer customer1 = new Customer(1
-            ,"paco"
+            , "paco"
             , "1234"
             , new ArrayList<>());
     private Customer customer2 = new Customer(2
-            ,"pepe"
+            , "pepe"
             , "1111"
             , new ArrayList<>());
 
@@ -49,18 +47,18 @@ public class ExchangeServiceImplTest {
     private ArgumentCaptor<Integer> appointmentIdCaptor;
 
     @Spy
-    private Appointment appointment1 = new Appointment(LocalDateTime.of(2024, 6, 10,6, 0)
-            , LocalDateTime.of(2024, 6, 16,18, 0)
+    private Appointment appointment1 = new Appointment(LocalDateTime.of(2024, 6, 10, 6, 0)
+            , LocalDateTime.of(2024, 6, 16, 18, 0)
             , null
             , null
             , AppointmentStatus.SCHEDULED
             , customer1
             , null
-                                );
+    );
 
     @Spy
-    private Appointment appointment2 = new Appointment(LocalDateTime.of(2024, 5, 18,8, 15)
-            , LocalDateTime.of(2024, 5, 18,10, 15)
+    private Appointment appointment2 = new Appointment(LocalDateTime.of(2024, 5, 18, 8, 15)
+            , LocalDateTime.of(2024, 5, 18, 10, 15)
             , null
             , null
             , AppointmentStatus.SCHEDULED
@@ -139,8 +137,38 @@ public class ExchangeServiceImplTest {
      */
     @Test
     void checkIfExchangeIsPossibleTest() {
+        AppointmentRepository appointmentRepository = Mockito.mock(AppointmentRepository.class);
+        NotificationService notificationService = Mockito.mock(NotificationService.class);
+        ExchangeRequestRepository exchangeRequestRepository = Mockito.mock(ExchangeRequestRepository.class);
 
+        ExchangeServiceImpl exchangeService = new ExchangeServiceImpl(appointmentRepository, notificationService, exchangeRequestRepository);
+
+        int userId = 1;
+        int oldAppointmentId = 1;
+        int newAppointmentId = 2;
+
+        Customer customer = new Customer();
+        customer.setId(2); // El userId del oldAppointment es diferente al userId proporcionado
+
+        Appointment oldAppointment = new Appointment();
+        oldAppointment.setId(oldAppointmentId);
+        oldAppointment.setCustomer(customer);
+        oldAppointment.setStart(LocalDateTime.now().plusDays(2));
+
+        Appointment newAppointment = new Appointment();
+        newAppointment.setId(newAppointmentId);
+        newAppointment.setStart(LocalDateTime.now().plusDays(2));
+
+        Mockito.when(appointmentRepository.getOne(oldAppointmentId)).thenReturn(oldAppointment);
+        Mockito.when(appointmentRepository.getOne(newAppointmentId)).thenReturn(newAppointment);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            exchangeService.checkIfExchangeIsPossible(oldAppointmentId, newAppointmentId, userId);
+        });
+
+        assert (exception.getMessage().contains("Unauthorized"));
     }
+
 
     /**
      * Crea un stub para exchangeRequestRepository.getOne
@@ -151,8 +179,35 @@ public class ExchangeServiceImplTest {
      * rechazado (REJECTED).
      * Verfifica se invoca al método con el exchangeRequest del stub.
      */
-     void rejectExchangeTest() {
+    @Test
+    void rejectExchangeTest() {
+        AppointmentRepository appointmentRepository = Mockito.mock(AppointmentRepository.class);
+        NotificationService notificationService = Mockito.mock(NotificationService.class);
+        ExchangeRequestRepository exchangeRequestRepository = Mockito.mock(ExchangeRequestRepository.class);
 
-     }
+        ExchangeServiceImpl exchangeService = new ExchangeServiceImpl(appointmentRepository, notificationService, exchangeRequestRepository);
 
+        int exchangeId = 1;
+
+        Appointment requestor = new Appointment();
+        requestor.setId(1);
+
+        ExchangeRequest exchangeRequest = new ExchangeRequest();
+        exchangeRequest.setId(exchangeId);
+        exchangeRequest.setRequestor(requestor);
+        exchangeRequest.setStatus(ExchangeStatus.PENDING);
+
+        Mockito.when(exchangeRequestRepository.getOne(exchangeId)).thenReturn(exchangeRequest);
+
+        exchangeService.rejectExchange(exchangeId);
+
+        ArgumentCaptor<ExchangeRequest> exchangeRequestCaptor = ArgumentCaptor.forClass(ExchangeRequest.class);
+        Mockito.verify(exchangeRequestRepository).save(exchangeRequestCaptor.capture());
+        ExchangeRequest capturedExchangeRequest = exchangeRequestCaptor.getValue();
+
+        assertEquals(ExchangeStatus.REJECTED, capturedExchangeRequest.getStatus());
+        Mockito.verify(exchangeRequestRepository).save(exchangeRequest);
+    }
 }
+
+
