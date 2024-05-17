@@ -98,8 +98,6 @@ public class SudokuTest {
     void isValidPlacementShouldReturnTrueIfNumberDoesNotExistsInRowColumnAndBox() {
         Sudoku sudoku = new Sudoku();
         sudoku.fillBoardRandomly();
-        sudoku.printBoard();
-//        sudoku.putNumberInBoard(10, 0, 0);
         assertThat(sudoku.isValidPlacement(10, 0, 0)).isTrue();
     }
 
