@@ -86,21 +86,14 @@ public class ExchangeServiceImplTest {
     @Test
     void checkIfEligibleForExchange() {
 
-//        Appointment appointment = new Appointment();
-//        appointment.setStart(LocalDateTime.now().plusDays(1));
-//        appointment.setStatus(AppointmentStatus.SCHEDULED);
-//
-//        Customer customer = new Customer();
-//        customer.setId(3);
-//        appointment.setCustomer(customer);
-//        when(appointmentRepository.getOne(anyInt())).thenReturn(appointment);
-//
-//
-//        boolean result = exchangeService.checkIfEligibleForExchange(3, 1);
-//
-//
-//        assertTrue(result);
+        Appointment appointment = new Appointment();
+        appointment.setStart(LocalDateTime.now().plusDays(1));
+        appointment.setStatus(AppointmentStatus.SCHEDULED);
+        appointment.setCustomer(new Customer(4, "juan", "2222", new ArrayList<>()));
 
+        when(appointmentRepository.getOne(anyInt())).thenReturn(appointment);
+
+        assertFalse(exchangeService.checkIfEligibleForExchange(1, 3));
     }
 
 
